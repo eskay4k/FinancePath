@@ -5,7 +5,7 @@ import {
   inferTopic,
   type NewsArticle,
   type NewsResponse,
-} from "../src/data/news";
+} from "../src/data/news.js";
 export const feeds = [
   {
     name: "BBC News",

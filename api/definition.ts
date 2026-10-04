@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { getDefinition, validWord } from "../server/definition-service";
+import { getDefinition, validWord } from "../server/definition-service.js";
 export default async function handler(
   request: IncomingMessage,
   response: ServerResponse,

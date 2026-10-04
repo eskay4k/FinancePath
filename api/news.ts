@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { getNews } from "../server/news-service";
+import { getNews } from "../server/news-service.js";
 export default async function handler(
   request: IncomingMessage,
   response: ServerResponse,
