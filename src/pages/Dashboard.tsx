@@ -1,3 +1,5 @@
+import { useAuth } from "../auth-context";
+import { supabase } from "../supabase";
 import { Link, Navigate } from "react-router-dom";
 import { ArrowRight, CircleCheck, Sprout, Newspaper } from "lucide-react";
 import { lessons, fundamentalLessons, decoderLessons } from "../data/lessons";
@@ -15,7 +17,9 @@ export function Dashboard() {
     "Your next lesson, learning path, and finance progress, all in one place.",
   );
   const { profile, progress, setProgress } = useProgress();
+  const { user } = useAuth();
   const [changingLevel, setChangingLevel] = useState(false);
+  if (supabase && !user) return <Navigate to="/login" replace />;
   if (!profile) return <Navigate to="/signup" replace />;
   if (!progress.selectedLevel)
     return <Navigate to="/assessment?onboarding=1" replace />;

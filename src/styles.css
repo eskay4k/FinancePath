@@ -4324,3 +4324,80 @@ h3,
     flex-direction: column;
   }
 }
+
+.auth-notice,
+.auth-error {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #edf4e7;
+}
+.auth-error {
+  color: #8b302e;
+  background: #fff4f2;
+}
+.setup-card form > input[type="email"],
+.setup-card form > input[type="password"] {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font: inherit;
+  margin: 6px 0 18px;
+  background: white;
+}
+.setup-card form > label {
+  display: block;
+}
+.setup-card form > .profile-consent {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+.account-sync {
+  padding: 8px 24px;
+  text-align: center;
+  font-size: 13px;
+  background: #edf4e7;
+}
+.account-sync button {
+  margin-left: 12px;
+  border: 0;
+  background: none;
+  text-decoration: underline;
+  cursor: pointer;
+  font: inherit;
+}
+.nav-logout {
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  padding: 8px;
+}
+.account-page {
+  max-width: 780px;
+}
+.account-page section {
+  padding: 22px 0;
+  border-bottom: 1px solid var(--line);
+}
+.account-page form {
+  display: grid;
+  gap: 12px;
+  max-width: 420px;
+}
+.account-page input {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font: inherit;
+}
+.account-page details {
+  margin: 18px 0;
+}
+.account-page summary {
+  cursor: pointer;
+  font-weight: 800;
+}

@@ -120,13 +120,9 @@ export function About() {
             </p>
           </section>
           <section>
-            <h2>Your browser, your progress</h2>
+            <h2>Your account, your progress</h2>
             <p>
-              Your local profile, selected level, learning days, article reads,
-              completed lessons, quiz results, and assessment result are saved
-              in local storage on this browser. They don’t sync across devices,
-              and clearing browser data removes them. FinancePath includes no
-              analytics or tracking.
+              An account saves your nickname and learning progress with Supabase, so you can continue on another device. Earlier browser-only progress can be imported from Account settings. The app keeps a local cache for connection failures. FinancePath itself has no analytics or advertising tracking; the optional TradingView chart uses its own privacy practices.
             </p>
           </section>
         </article>

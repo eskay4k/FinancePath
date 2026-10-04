@@ -1,6 +1,6 @@
 # FinancePath
 
-A student-led financial-literacy frontend for high-school and college-age learners. Decode financial headlines at Beginner, Intermediate, or Advanced level, build foundational knowledge, and track your progress with a local learning profile.
+A student-led financial-literacy frontend for high-school and college-age learners. Decode financial headlines at Beginner, Intermediate, or Advanced level, build foundational knowledge, and save learning progress to an email/password account.
 
 ## Run locally
 
@@ -21,12 +21,12 @@ pnpm build      # TypeScript plus production build in dist/
 pnpm preview    # Serve the production build locally
 ```
 
-No API keys or paid news subscription are needed. The app now includes a small read-only server endpoint for publisher RSS feeds; local profiles still do not use authentication. Vite serves the endpoint in development and preview, and Vercel runs it as a function. Dependencies are pinned by `pnpm-lock.yaml`. `pnpm-workspace.yaml` permits esbuild's required build script.
+No API keys or paid news subscription are needed. The app now includes a small read-only server endpoint for publisher RSS feeds; email/password accounts and private progress use Supabase. Vite serves the endpoint in development and preview, and Vercel runs it as a function. Dependencies are pinned by `pnpm-lock.yaml`. `pnpm-workspace.yaml` permits esbuild's required build script.
 
 ## What is included
 
 - Simple landing page with a single entry action.
-- Browser-only profile setup at `/signup`, then a guided level assessment.
+- Email/password signup at `/signup`, email confirmation, login, password reset, and a guided level assessment.
 - Learning dashboard at `/dashboard` with a recommended next lesson, basics path, and progress.
 - Six-question assessment with a clearly marked, score-based recommendation and an explicit starting-path action.
 - Pip, Finn, and Sage companions, interactive reading tips, optional browser speech, and level-adaptive presentation within one green identity.
@@ -60,11 +60,17 @@ Edit `src/config.ts`:
 
 The founder placeholder note disappears automatically when both fields contain your own information. No credentials, testimonials, affiliations, or usage statistics are invented.
 
-## Profile and local progress
+## Accounts and learning progress
 
-The setup flow saves a nickname in `financepath.profile.v1`. This is a local profile, not authentication: no email, password, remote user record, or device sync exists. Returning profiles can resume from the dashboard. The assessment can be skipped with Beginner selected, or completed with a suggested level that the learner can override. Real signup requires a separately configured authentication service.
+Copy `.env.example` to `.env.local` and set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` to the project's public settings. Never use a secret or service-role key. Set the same variables in Vercel before building.
 
-`src/progress.ts` validates and manages the single `financepath.progress.v1` localStorage record. Shared state is exposed by `src/ProgressContext.tsx` and `src/useProgress.ts`.
+Run `supabase/schema.sql` in the project's SQL editor. It enables row-level security, permits reading only the current user's record, and saves through an authenticated revision-checked function. Configure the site URL and exact `/auth/confirm` and `/reset-password` redirect URLs for production and localhost. Keep email confirmation enabled. Configure custom SMTP before opening registration to the public: Supabase's built-in sender only delivers to project team members.
+
+`/signup` collects email, password, nickname, and agreement to the terms and 13+ requirement. `/login`, `/forgot-password`, `/reset-password`, and `/auth/confirm` handle returning and recovering accounts. `/account` manages the nickname, deliberate import of existing browser progress, and account deletion after password reauthentication. Password handling belongs to Supabase; the app does not store passwords. Deletion removes the auth user and its learning row through a restricted database function.
+
+Progress is loaded before learning changes are enabled. Each account has a separate browser cache; cloud writes use revisions to detect competing devices instead of silently overwriting them. Failed writes retain a recoverable browser draft. Account settings can deliberately merge an old browser profile or an unsynced draft. Existing browser-only progress is never automatically assigned to whoever next signs in.
+
+`src/progress.ts` validates progress records. Shared state is exposed by `src/ProgressContext.tsx` and `src/useProgress.ts`; `src/cloud-progress.ts` validates and merges account records.
 
 The record also stores `activityDays` as unique local-calendar dates and `readArticles` as the latest read timestamp per news ID. Existing records remain version 1; older completion timestamps migrate into learning days. A current streak can end today or yesterday; a missed intervening day breaks it. Article reads, lesson completions, lesson quiz submissions, and a completed level assessment count once per local day. Merely opening a page or changing a level does not count.
 
@@ -72,7 +78,7 @@ The record stores the explicitly chosen level (initially `null`), unique lesson 
 
 Reset clears lesson completions, quiz results, article-read records, and learning-day history while preserving level, profile, and assessment history. Invalid fields are ignored; unsupported schema versions become clean state. If storage fails, state stays usable in memory and a single persistent non-blocking message explains the limitation.
 
-Progress is specific to the browser and site origin. It does not sync between devices, localhost, and the deployed site. Clearing browser data removes progress. In-progress assessment answers are retained while moving between questions, but do not persist until the assessment is submitted. There are no analytics.
+Signed-in progress syncs between devices that use the same Supabase project. Browser-only guest progress and unsynced drafts remain specific to the browser and site origin. Clearing browser data removes those local copies. In-progress assessment answers are retained while moving between questions, but do not persist until the assessment is submitted. There are no analytics.
 
 ## Automatic news and word help
 

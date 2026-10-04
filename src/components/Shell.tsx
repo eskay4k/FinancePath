@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { ArrowUpRight, ExternalLink, Menu, X } from "lucide-react";
+import { useAuth } from "../auth-context";
 import { useProgress } from "../useProgress";
 import { FEEDBACK_FORM_URL, LEGAL_CONTACT } from "../config";
 
@@ -23,9 +24,16 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const { profile, progress } = useProgress();
+  const { user, signOut } = useAuth();
   const publicPage =
-    ["/", "/signup"].includes(location.pathname) ||
-    location.pathname === "/assessment";
+    [
+      "/",
+      "/signup",
+      "/login",
+      "/forgot-password",
+      "/reset-password",
+      "/auth/confirm",
+    ].includes(location.pathname) || location.pathname === "/assessment";
   const links = publicPage
     ? [["/about", "About"]]
     : [
@@ -66,6 +74,20 @@ export function Header() {
               {label}
             </NavLink>
           ))}
+          {user && (
+            <Link to="/account" onClick={() => setOpen(false)}>
+              Account
+            </Link>
+          )}
+          {user ? (
+            <button className="nav-logout" onClick={() => void signOut()}>
+              Log out
+            </button>
+          ) : (
+            <Link to="/login" onClick={() => setOpen(false)}>
+              Log in
+            </Link>
+          )}
           <Link
             className="nav-cta"
             to={

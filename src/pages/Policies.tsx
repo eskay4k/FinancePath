@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { useAuth } from "../auth-context";
 import { useProgress } from "../useProgress";
 import { useMetadata } from "../useMetadata";
 import { LEGAL_OPERATOR, LEGAL_CONTACT, LEGAL_STATE } from "../config";
@@ -10,11 +11,11 @@ const content: Record<string, { title: string; sections: [string, string][] }> =
       sections: [
         [
           "Your learning data",
-          "FinancePath saves your nickname, selected level, assessment answers, lesson and quiz progress, article reads, and learning dates in this browser. These are not an online account and are not sent to our news, dictionary, or market-data providers. Use a nickname rather than your full legal name. Do not enter financial account numbers, payment details, or other sensitive information.",
+          "When you create an account, Supabase handles your email and password authentication. FinancePath stores your nickname, selected level, assessment answers, lesson and quiz progress, article reads, and learning dates in your private account database so they can sync across devices. Account data is also cached in this browser. Earlier guest progress is stored locally and is imported only when you choose to import it. Your profile and email are not sent to news, dictionary, or market-data providers. Use a nickname rather than your full legal name. Do not enter financial account numbers, payment details, or other sensitive information.",
         ],
         [
           "Requests and service providers",
-          "Your browser contacts our host to load the site and its APIs. The host may process IP addresses, request times, URLs, and browser information for delivery, security, and operational logs. The exact hosting provider and log retention must be confirmed before public launch. News requests are made by our server. The optional TradingView chart loads only after you choose Show market chart. Loading it sends your IP address and browser/device information directly to TradingView and its service providers; they may use cookies or similar storage under their own privacy policy. It is isolated from FinancePath’s profile storage. When you request a general word definition, the selected word is sent through our server to Wikimedia/Wiktionary. Publisher links open external sites with their own privacy policies. Optional read-aloud uses your browser or operating system voice service, which may process text remotely depending on your device.",
+          "Your browser contacts our host to load the site and its APIs. The host may process IP addresses, request times, URLs, and browser information for delivery, security, and operational logs. Vercel hosts the application and its news/dictionary APIs; Supabase provides account authentication and the progress database. These providers may process operational logs under their policies. Operational retention and backup schedules still require review. News requests are made by our server. The optional TradingView chart loads only after you choose Show market chart. Loading it sends your IP address and browser/device information directly to TradingView and its service providers; they may use cookies or similar storage under their own privacy policy. It is isolated from FinancePath’s profile storage. When you request a general word definition, the selected word is sent through our server to Wikimedia/Wiktionary. Publisher links open external sites with their own privacy policies. Optional read-aloud uses your browser or operating system voice service, which may process text remotely depending on your device.",
         ],
         [
           "Tracking and choices",
@@ -22,11 +23,11 @@ const content: Record<string, { title: string; sections: [string, string][] }> =
         ],
         [
           "Retention and deletion",
-          "Local learning data remains until you delete it, clear this site’s browser storage, or your browser removes it. The deletion control below removes FinancePath’s saved profile and progress in this browser. It does not remove data in other browsers or hosting logs. If you contact the operator, the operator must respond to applicable privacy requests and establish retention for those communications.",
+          "Account learning data remains until you clear learning progress or delete your account. Account settings includes permanent account deletion; the learning-data control below clears account progress while retaining your login and nickname. Guest progress remains locally until deleted. Local caches on other devices and provider logs/backups may remain subject to their retention policies. If you contact the operator, the operator must respond to applicable privacy requests and establish retention for those communications.",
         ],
         [
           "Children and regional rights",
-          "The current learning profile is intended for people age 13 and older; we do not offer a parental-consent system. Do not submit children’s personal information. A simple age statement does not resolve every children’s privacy obligation, and the audience and integrations require review before launch. Privacy rights can vary by state and circumstances. Use the operator’s contact for access, correction, deletion, or other applicable requests once configured.",
+          "The current learning profile is intended for people age 13 and older; we do not offer a parental-consent system. Do not submit children’s personal information. A simple age statement does not resolve every children’s privacy obligation, and the audience and integrations require review before launch. Privacy rights can vary by state and circumstances. Contact saadkxns@gmail.com for access, correction, deletion, or other applicable requests.",
         ],
       ],
     },
@@ -64,7 +65,7 @@ const content: Record<string, { title: string; sections: [string, string][] }> =
         ],
         [
           "Your choice",
-          "Creating a local profile explicitly saves your learning information. A tracking-consent banner is not included because this build has no optional analytics or advertising tracking to consent to. The optional TradingView chart is held behind a Show market chart button and is not loaded before you choose it; it may use cookies and process device data. Hide chart stops the embed but does not delete third-party cookies. This is not a determination for every jurisdiction: before launch, audit the actual host and any added services, and introduce consent controls before loading tracking that requires consent.",
+          "Creating an account saves your email authentication record and learning information with Supabase; guest records stay in this browser until deliberately imported. Account sessions and cached learning records use browser storage for the requested login and learning features. This build has no optional analytics or advertising tracking. The optional TradingView chart is held behind a Show market chart button and is not loaded before you choose it; it may use cookies and process device data. Hide chart stops the embed but does not delete third-party cookies. This is not a determination for every jurisdiction: before launch, audit the actual host and any added services, and introduce consent controls before loading tracking that requires consent.",
         ],
         [
           "External sites",
@@ -127,6 +128,7 @@ const content: Record<string, { title: string; sections: [string, string][] }> =
 export function Policies() {
   const { kind = "privacy" } = useParams();
   const page = content[kind];
+  const { user } = useAuth();
   const { deleteLearningData } = useProgress();
   const [confirm, setConfirm] = useState(false),
     [deleted, setDeleted] = useState(false),
@@ -145,7 +147,7 @@ export function Policies() {
   return (
     <div className="container page policy-page">
       <h1 tabIndex={-1}>{page.title}</h1>
-      <p>Last updated October 3, 2026 · United States</p>
+      <p>Last updated October 4, 2026 · United States</p>
       <nav className="policy-nav" aria-label="Policies">
         {Object.entries(content).map(([k, v]) => (
           <Link
@@ -214,17 +216,15 @@ export function Policies() {
           <h2>Your saved learning data</h2>
           {deletionFailed && (
             <p role="alert">
-              Browser storage could not be cleared. Clear this site’s storage in
-              your browser settings to finish deletion.
+              Learning progress could not be cleared. Wait for syncing to finish and retry; contact support if the problem continues. Clearing browser storage alone does not delete cloud data.
             </p>
           )}
           <p>
-            Delete your nickname, level, assessment, lessons, quiz results,
-            article reads, and streak from this browser.
+            {user ? "Clear your level, assessment, lessons, quiz results, article reads, and streak from your account and this browser. Your login and nickname stay available. Use Account settings to delete the entire account." : "Delete your nickname, level, assessment, lessons, quiz results, article reads, and streak from this browser."}
           </p>
           {deleted ? (
             <p role="status">
-              Your saved learning data has been deleted from this browser.
+              Your learning progress has been cleared.
             </p>
           ) : confirm ? (
             <>
@@ -234,8 +234,8 @@ export function Policies() {
               </p>
               <button
                 className="button secondary"
-                onClick={() => {
-                  const success = deleteLearningData();
+                onClick={async () => {
+                  const success = await deleteLearningData();
                   setDeleted(success);
                   setDeletionFailed(!success);
                   setConfirm(false);
